@@ -12,6 +12,9 @@ struct PlaticaWatch_Watch_AppApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear {
+                    let key = getOpenAIKey()
+                }
         }
     }
 }
