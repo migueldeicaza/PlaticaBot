@@ -121,7 +121,8 @@ extension UIScrollView {
 #endif
 
 struct ChatView: View {
-    @State var chat = ChatGPT(key: getOpenAIKey())
+    @State var chat = ChatGPT(key: openAIKey.key)
+    @ObservedObject var key = openAIKey
     @State var newModel = false
     @State var prompt: String = ""
     @State var started = Date ()
@@ -188,6 +189,7 @@ struct ChatView: View {
         prompt = ""
         store.interactions = []
         started = Date ()
+        chat = ChatGPT(key: key.key)
     }
     
     func getMessageSummary () -> String {
@@ -215,6 +217,7 @@ struct ChatView: View {
         appended += 1
         Task {
             chat.model = newModel ? "gpt-4-0314" : "gpt-3.5-turbo"
+            chat.key = openAIKey.key
             guard let results = try? await chat.streamChatText(copy) else {
                 appendAnswer("Failed to communicate")
                 return

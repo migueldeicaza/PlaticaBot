@@ -57,6 +57,8 @@ struct GeneralSettings: View {
                 HStack {
                     Spacer ()
                     Button ("Ok") {
+                        setOpenAIKey(key)
+                        openAIKey.key = key
                         settingsShown = false
                     }
                     Spacer ()
