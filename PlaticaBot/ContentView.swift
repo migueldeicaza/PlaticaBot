@@ -2,20 +2,36 @@
 //  ContentView.swift
 //  PlaticaBot
 //
-//  Created by Miguel de Icaza on 3/21/23.
+//  Created by Miguel de Icaza on 3/13/23.
 //
 
 import SwiftUI
-
+import Foundation
 struct ContentView: View {
+    @State var settingsShown = false
+    @Environment(\.openURL) var openURL
+    @ObservedObject var key = openAIKey
+    
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
+        NavigationStack {
+            if key.key == "" {
+#if os(iOS)
+                iOSGeneralSettings(settingsShown: .constant(true), dismiss: false)
+                
+#else
+                Text ("Please set your key in Settings")
+                Button (action: {
+                    #if os(macOS)
+                    NSApp.sendAction(Selector(("showSettingsWindow:")), to: nil, from: nil)
+                    #endif
+                }) {
+                    Text ("Open Settings")
+                }
+#endif
+            } else {
+                ChatView ()
+            }
         }
-        .padding()
     }
 }
 
