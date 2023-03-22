@@ -39,7 +39,7 @@ struct SingleInteractionView<Content:View, Content2:View>: View {
             Spacer()
         }
         .padding()
-        .foregroundColor(Color.black)
+        .foregroundColor(.primary)
         .background (color)
         .clipShape(RoundedRectangle(cornerRadius: 8))
     }
@@ -49,8 +49,8 @@ struct SingleInteractionView<Content:View, Content2:View>: View {
 let userColor = Color.orange
 let assistantColor = Color.blue
 #else
-let userColor = Color.orange.opacity(0.2)
-let assistantColor = Color.blue.opacity(0.1)
+let userColor = Color ("UserColor")
+let assistantColor = Color ("BotColor")
 #endif
 
 struct InteractionView: View {
@@ -76,7 +76,7 @@ struct InteractionView: View {
                     Spacer ()
                     Image (systemName: speaking == interaction.id ? "stop" : "play")
                         .font (.footnote)
-                        .foregroundColor(speaking == interaction.id ? Color.white : Color.black)
+                        .foregroundColor(speaking == interaction.id ? Color.accentColor : Color.primary)
                         .onTapGesture {
                             if speaking == interaction.id {
                                 synthesizer.stopSpeaking(at: .word)

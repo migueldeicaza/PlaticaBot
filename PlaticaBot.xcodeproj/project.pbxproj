@@ -27,6 +27,7 @@
 		4982B6C829CA3665008D2CCD /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6C529CA3665008D2CCD /* Settings.swift */; };
 		4982B6C929CA3665008D2CCD /* MarkdownHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6C629CA3665008D2CCD /* MarkdownHelpers.swift */; };
 		4982B6CA29CA3665008D2CCD /* MarkdownHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6C629CA3665008D2CCD /* MarkdownHelpers.swift */; };
+		4982B6EC29CB9E15008D2CCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4982B69229CA333E008D2CCD /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -245,6 +246,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4982B6B729CA35F0008D2CCD /* Preview Assets.xcassets in Resources */,
+				4982B6EC29CB9E15008D2CCD /* Assets.xcassets in Resources */,
 				4982B6B429CA35F0008D2CCD /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
