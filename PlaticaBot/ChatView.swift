@@ -122,6 +122,7 @@ extension UIScrollView {
 
 struct ChatView: View {
     @State var chat = ChatGPT(key: openAIKey.key)
+    @Binding var temperature: Float
     @ObservedObject var key = openAIKey
     @State var newModel = false
     @State var prompt: String = ""
@@ -161,13 +162,14 @@ struct ChatView: View {
         }
     }
     
-    init (prime: Bool = false) {
+    init (prime: Bool = false, temperature: Binding<Float>) {
         self._prime = State (initialValue: prime)
         _synthesizer = State (initialValue: AVSpeechSynthesizer())
         _synthesizerDelegate = State (initialValue: nil)
+        _temperature = temperature
         let d = MyDelegate (speaking: .constant(nil))
         _synthesizerDelegate = State (initialValue: d)
-        synthesizer.delegate = synthesizerDelegate        
+        synthesizer.delegate = synthesizerDelegate
     }
     
     @MainActor
@@ -218,7 +220,7 @@ struct ChatView: View {
         Task {
             chat.model = newModel ? "gpt-4-0314" : "gpt-3.5-turbo"
             chat.key = openAIKey.key
-            switch await chat.streamChatText(copy) {
+            switch await chat.streamChatText(copy, temperature: temperature) {
             case .failure(let error):
                 appendAnswer("Communication Error:\n\(error.description)")
                 return
@@ -373,7 +375,7 @@ struct ChatView: View {
         }
         #if os(iOS)
         .sheet (isPresented: $showSettings) {
-            iOSGeneralSettings(settingsShown: $showSettings, dismiss: true)
+            iOSGeneralSettings(settingsShown: $showSettings, temperature: $temperature, dismiss: true)
         }
         #endif
         .onAppear {
@@ -388,6 +390,6 @@ struct ChatView: View {
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView(prime: true)
+        ChatView(prime: true, temperature: .constant(1.0))
     }
 }

@@ -11,6 +11,7 @@ struct ContentView: View {
     @State var settingsShown = false
     @Environment(\.openURL) var openURL
     @ObservedObject var key = openAIKey
+    @State var temperature: Float = 1.0
     
     var body: some View {
         NavigationStack {
@@ -29,7 +30,7 @@ struct ContentView: View {
                 }
 #endif
             } else {
-                ChatView ()
+                ChatView (temperature: $temperature)
             }
         }
     }

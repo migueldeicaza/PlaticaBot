@@ -11,7 +11,8 @@ import SwiftUI
 struct PlaticaBotApp: App {
     #if os(macOS)
     @Environment(\.openWindow) private var openWindow
-   
+    @State var temperature: Float = 1.0
+    
     func quit () {
         NSApplication.shared.terminate(nil)
     }
@@ -23,10 +24,10 @@ struct PlaticaBotApp: App {
         }
         #if os(macOS)
         Window("Chat", id: "chat") {
-            ChatView ()
+            ChatView (temperature: $temperature)
         }
         Settings {
-            SettingsView(settingsShown: .constant(true), dismiss: false)
+            SettingsView(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
         }
 
         MenuBarExtra("", systemImage: "brain") {

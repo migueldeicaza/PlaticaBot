@@ -29,28 +29,30 @@ var openAIKey = OpenAIKey ()
 
 struct GeneralSettings: View {
     @Binding var settingsShown: Bool
+    @Binding var temperature: Float
     @State var key = getOpenAIKey()
     var dismiss: Bool
     
     var body: some View {
-        VStack (alignment: .leading){
-            Text ("General Settings")
-                .bold()
-                .padding ([.bottom])
-            Grid {
-                GridRow (alignment: .firstTextBaseline){
-                    Text ("OpenAI Key")
-                    VStack (alignment: .leading){
-                        TextField ("key", text: $key)
-                            .onSubmit {
-                                setOpenAIKey(key)
-                                openAIKey.key = key
-                            }
-                        Text ("Create or get an OpenAI key from the [API keys](https://platform.openai.com/account/api-keys) dashboard.")
-                            .foregroundColor(.secondary)
-                            .font (.caption)
-                    }
+        Form {
+            LabeledContent ("Temperature") {
+                Slider(value: $temperature, in: 0...2.0) {
+                    EmptyView()
+                } minimumValueLabel: {
+                    Text("Focused").font(.footnote).fontWeight(.thin)
+                } maximumValueLabel: {
+                    Text("Random").font(.footnote).fontWeight(.thin)
                 }
+            }
+            VStack (alignment: .leading){
+                TextField ("OpenAI Key", text: $key)
+                    .onSubmit {
+                        setOpenAIKey(key)
+                        openAIKey.key = key
+                    }
+                Text ("Create or get an OpenAI key from the [API keys](https://platform.openai.com/account/api-keys) dashboard.")
+                    .foregroundColor(.secondary)
+                    .font (.caption)
             }
             .padding ()
             if dismiss {
@@ -64,29 +66,29 @@ struct GeneralSettings: View {
                     Spacer ()
                 }
             }
-            Spacer ()
         }
-        .padding ()
     }
 }
 
 struct iOSGeneralSettings: View {
     @Binding var settingsShown: Bool
+    @Binding var temperature: Float
     var dismiss: Bool
     var body: some View {
         NavigationView {
-            GeneralSettings(settingsShown: $settingsShown, dismiss: dismiss)
+            GeneralSettings(settingsShown: $settingsShown, temperature: $temperature, dismiss: dismiss)
         }
         .navigationTitle("Settings")
     }
 }
 struct SettingsView: View {
     @Binding var settingsShown: Bool
+    @Binding var temperature: Float
     var dismiss: Bool
     
     var body: some View {
         TabView {
-            GeneralSettings (settingsShown: $settingsShown, dismiss: dismiss)
+            GeneralSettings (settingsShown: $settingsShown, temperature: $temperature, dismiss: dismiss)
                 .tabItem {
                     Label ("General", systemImage: "person")
                 }
@@ -96,6 +98,6 @@ struct SettingsView: View {
 
 struct Settings_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(settingsShown: .constant (true), dismiss: false)
+        SettingsView(settingsShown: .constant (true), temperature: .constant(1.0), dismiss: false)
     }
 }
