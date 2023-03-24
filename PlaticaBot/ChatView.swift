@@ -218,22 +218,24 @@ struct ChatView: View {
         Task {
             chat.model = newModel ? "gpt-4-0314" : "gpt-3.5-turbo"
             chat.key = openAIKey.key
-            guard let results = try? await chat.streamChatText(copy) else {
-                appendAnswer("Failed to communicate")
+            switch await chat.streamChatText(copy) {
+            case .failure(let error):
+                appendAnswer("Communication Error:\n\(error.description)")
                 return
-            }
-            for try await result in results {
-                if let result {
-                    print ("Got: \(result)")
-                    DispatchQueue.main.async {
-                        appendAnswer (result)
+            case .success(let results):
+                for try await result in results {
+                    if let result {
+                        print ("Got: \(result)")
+                        DispatchQueue.main.async {
+                            appendAnswer (result)
+                        }
                     }
                 }
+                DispatchQueue.main.async {
+                    appended += 1
+                }
+                saveChat ()
             }
-            DispatchQueue.main.async {
-                appended += 1
-            }
-            saveChat ()
         }
     }
     
