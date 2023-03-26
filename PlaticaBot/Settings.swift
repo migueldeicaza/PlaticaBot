@@ -36,7 +36,7 @@ struct GeneralSettings: View {
     var body: some View {
         Form {
             LabeledContent ("Temperature") {
-                Slider(value: $temperature, in: 0...2.0) {
+                Slider(value: $temperature, in: 0.4...1.6, step: 0.2) {
                     EmptyView()
                 } minimumValueLabel: {
                     Text("Focused").font(.footnote).fontWeight(.thin)
