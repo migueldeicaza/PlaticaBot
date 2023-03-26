@@ -11,13 +11,13 @@ struct ContentView: View {
     @State var settingsShown = false
     @Environment(\.openURL) var openURL
     @ObservedObject var key = openAIKey
-    @State var temperature: Float = 1.0
+    @Binding var temperature: Float
     
     var body: some View {
         NavigationStack {
             if key.key == "" {
 #if os(iOS)
-                iOSGeneralSettings(settingsShown: .constant(true), dismiss: false)
+                iOSGeneralSettings(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
                 
 #else
                 Text ("Please set your key in Settings")
@@ -38,6 +38,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(temperature: .constant(1.0))
     }
 }

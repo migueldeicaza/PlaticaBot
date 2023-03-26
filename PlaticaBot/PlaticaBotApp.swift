@@ -20,11 +20,11 @@ struct PlaticaBotApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            ContentView(temperature: $temperature)
         }
         #if os(macOS)
         Window("Chat", id: "chat") {
-            ChatView (temperature: $temperature)
+            ChatView(temperature: $temperature)
         }
         Settings {
             SettingsView(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
