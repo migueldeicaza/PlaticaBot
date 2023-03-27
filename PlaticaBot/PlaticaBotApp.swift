@@ -12,6 +12,7 @@ struct PlaticaBotApp: App {
     #if os(macOS)
     @Environment(\.openWindow) private var openWindow
     @State var temperature: Float = 1.0
+    @State var newModel: Bool = false
     
     func quit () {
         NSApplication.shared.terminate(nil)
@@ -20,14 +21,14 @@ struct PlaticaBotApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(temperature: $temperature)
+            ContentView(temperature: $temperature, newModel: $newModel)
         }
         #if os(macOS)
         Window("Chat", id: "chat") {
-            ChatView(temperature: $temperature)
+            ChatView(temperature: $temperature, newModel: $newModel)
         }
         Settings {
-            SettingsView(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
+            SettingsView(settingsShown: .constant(true), temperature: $temperature, newModel: $newModel, dismiss: false)
         }
 
         MenuBarExtra("", systemImage: "brain") {

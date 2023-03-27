@@ -12,6 +12,7 @@ struct ContentView: View {
     @Environment(\.openURL) var openURL
     @ObservedObject var key = openAIKey
     @Binding var temperature: Float
+    @Binding var newModel: Bool
     
     var body: some View {
         NavigationStack {
@@ -30,7 +31,7 @@ struct ContentView: View {
                 }
 #endif
             } else {
-                ChatView (temperature: $temperature)
+                ChatView (temperature: $temperature, newModel: $newModel)
             }
         }
     }
@@ -38,6 +39,6 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView(temperature: .constant(1.0))
+        ContentView(temperature: .constant(1.0), newModel: .constant(false))
     }
 }

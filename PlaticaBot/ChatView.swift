@@ -124,7 +124,7 @@ struct ChatView: View {
     @State var chat = ChatGPT(key: openAIKey.key)
     @Binding var temperature: Float
     @ObservedObject var key = openAIKey
-    @State var newModel = false
+    @Binding var newModel: Bool
     @State var prompt: String = ""
     @State var started = Date ()
     @ObservedObject var store = InteractionStorage ()
@@ -162,11 +162,12 @@ struct ChatView: View {
         }
     }
     
-    init (prime: Bool = false, temperature: Binding<Float>) {
+    init (prime: Bool = false, temperature: Binding<Float>, newModel: Binding<Bool>) {
         self._prime = State (initialValue: prime)
         _synthesizer = State (initialValue: AVSpeechSynthesizer())
         _synthesizerDelegate = State (initialValue: nil)
         _temperature = temperature
+        _newModel = newModel
         let d = MyDelegate (speaking: .constant(nil))
         _synthesizerDelegate = State (initialValue: d)
         synthesizer.delegate = synthesizerDelegate
@@ -390,6 +391,6 @@ struct ChatView: View {
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView(prime: true, temperature: .constant(1.0))
+        ChatView(prime: true, temperature: .constant(1.0), newModel: .constant(false))
     }
 }
