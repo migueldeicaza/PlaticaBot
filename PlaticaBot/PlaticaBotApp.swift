@@ -9,9 +9,9 @@ import SwiftUI
 
 @main
 struct PlaticaBotApp: App {
+    @State var temperature: Float = 1.0
     #if os(macOS)
     @Environment(\.openWindow) private var openWindow
-    @State var temperature: Float = 1.0
     
     func quit () {
         NSApplication.shared.terminate(nil)
