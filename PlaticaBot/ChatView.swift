@@ -376,7 +376,7 @@ struct ChatView: View {
         }
         #if os(iOS)
         .sheet (isPresented: $showSettings) {
-            iOSGeneralSettings(settingsShown: $showSettings, temperature: $temperature, dismiss: true)
+            iOSGeneralSettings(settingsShown: $showSettings, temperature: $temperature, newModel: $newModel, dismiss: true)
         }
         #endif
         .onAppear {

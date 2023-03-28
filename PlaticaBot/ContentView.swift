@@ -18,7 +18,7 @@ struct ContentView: View {
         NavigationStack {
             if key.key == "" {
 #if os(iOS)
-                iOSGeneralSettings(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
+                iOSGeneralSettings(settingsShown: .constant(true), temperature: $temperature, newModel: $newModel, dismiss: false)
                 
 #else
                 Text ("Please set your key in Settings")
