@@ -88,7 +88,7 @@ struct GeneralSettings: View {
 #if os(macOS)
             LabeledContent("Show Dock Icon") {
                 Toggle(isOn: $showDockIcon) {
-                    EmptyView()
+                    Text(" ")
                 }
                 .onChange(of: showDockIcon, perform: { newValue in
                     setShowDockIcon(newValue)
