@@ -22,18 +22,16 @@ struct PlaticaBotApp: App {
     #endif
     
     var body: some Scene {
-        WindowGroup {
+        WindowGroup (id: "chat") {
             ContentView(temperature: $temperature)
-        }
-        #if os(macOS)
-        Window("Chat", id: "chat") {
-            ChatView(temperature: $temperature)
                 .onAppear {
                     guard let window = NSApplication.shared.windows.first(where: { $0.isVisible }) else { return }
-                                window.orderFront(self)
-                                NSApplication.shared.activate(ignoringOtherApps: true)
+                    window.orderFront(self)
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+
                 }
         }
+        #if os(macOS)
         Settings {
             SettingsView(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
         }
