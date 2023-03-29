@@ -21,6 +21,33 @@ func setOpenAIKey (_ value: String) {
     NSUbiquitousKeyValueStore.default.synchronize()
 }
 
+#if os(macOS)
+let showDockIconKey = "ShowDockIcon-key"
+
+func getShowDockIcon() -> Bool {
+    if NSUbiquitousKeyValueStore.default.object(forKey: showDockIconKey) == nil {
+        return true
+    }
+
+    return NSUbiquitousKeyValueStore.default.bool(forKey: showDockIconKey)
+}
+
+func setShowDockIcon(_ showDockIcon: Bool) {
+    NSUbiquitousKeyValueStore.default.set(showDockIcon, forKey: showDockIconKey)
+    NSUbiquitousKeyValueStore.default.synchronize()
+    setApplicationActivationPolicy()
+}
+
+func setApplicationActivationPolicy() {
+    if getShowDockIcon() {
+        NSApp.setActivationPolicy(.regular)
+    } else {
+        NSApp.setActivationPolicy(.accessory)
+        NSApp.activate(ignoringOtherApps: true)
+    }
+}
+#endif
+
 class OpenAIKey: ObservableObject {
     @Published var key: String = getOpenAIKey()
 }
@@ -31,6 +58,9 @@ struct GeneralSettings: View {
     @Binding var settingsShown: Bool
     @Binding var temperature: Float
     @State var key = getOpenAIKey()
+#if os(macOS)
+    @State var showDockIcon = getShowDockIcon()
+#endif
     var dismiss: Bool
     
     var body: some View {
@@ -43,8 +73,8 @@ struct GeneralSettings: View {
                 } maximumValueLabel: {
                     Text("Random").font(.footnote).fontWeight(.thin)
                 }
-            }
-            VStack (alignment: .leading){
+            }.padding([.leading, .trailing])
+            VStack (alignment: .leading) {
                 TextField ("OpenAI Key", text: $key)
                     .onSubmit {
                         setOpenAIKey(key)
@@ -55,6 +85,16 @@ struct GeneralSettings: View {
                     .font (.caption)
             }
             .padding ()
+#if os(macOS)
+            LabeledContent("Show Dock Icon") {
+                Toggle(isOn: $showDockIcon) {
+                    Text(" ")
+                }
+                .onChange(of: showDockIcon, perform: { newValue in
+                    setShowDockIcon(newValue)
+                })
+            }.padding([.leading, .trailing])
+#endif
             if dismiss {
                 HStack {
                     Spacer ()
