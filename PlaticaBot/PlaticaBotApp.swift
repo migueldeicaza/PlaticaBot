@@ -6,6 +6,9 @@
 //
 
 import SwiftUI
+#if canImport(AppKit)
+import AppKit
+#endif
 
 @main
 struct PlaticaBotApp: App {
@@ -25,6 +28,11 @@ struct PlaticaBotApp: App {
         #if os(macOS)
         Window("Chat", id: "chat") {
             ChatView(temperature: $temperature)
+                .onAppear {
+                    guard let window = NSApplication.shared.windows.first(where: { $0.isVisible }) else { return }
+                                window.orderFront(self)
+                                NSApplication.shared.activate(ignoringOtherApps: true)
+                }
         }
         Settings {
             SettingsView(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
