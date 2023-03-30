@@ -14,8 +14,9 @@ import AVFoundation
 import AVFAudio
 
 /// Records what the user asked, the plain result, and the attributed version of it
-struct Interaction: Identifiable, Equatable, Hashable {
+struct Interaction: Identifiable, Equatable, Hashable, Codable {
     var id = UUID()
+    var date = Date ()
     var query: String
     var plain: String
 }
@@ -68,13 +69,16 @@ struct InteractionView: View {
                 VStack { Image (systemName: "person") }
             } text: {
                 Text (interaction.query)
+                #if !os(watchOS)
                     .textSelection(.enabled)
+                #endif
             }
             SingleInteractionView(color: assistantColor) {
                 VStack {
                     Image (systemName: "tortoise")
                         .font (.footnote)
                     Spacer ()
+                    
                     Image (systemName: speaking == interaction.id ? "stop" : "play")
                         .font (.footnote)
                         .foregroundColor(speaking == interaction.id ? Color.accentColor : Color.primary)
@@ -110,6 +114,31 @@ struct InteractionView: View {
     }
 }
 
+struct StaticChatView: View {
+    @Binding var interactions: [Interaction] 
+    @State var synthesizer: AVSpeechSynthesizer
+    @State var synthesizerDelegate: SpeechDelegate?
+    @State var speaking: UUID? = nil
+    
+    init (interactions: Binding<[Interaction]>) {
+        self._interactions = interactions
+        _synthesizer = State (initialValue: AVSpeechSynthesizer())
+        _synthesizerDelegate = State (initialValue: nil)
+        let d = SpeechDelegate (speaking: .constant(nil))
+        _synthesizerDelegate = State (initialValue: d)
+        synthesizer.delegate = synthesizerDelegate
+    }
+    
+    var body: some View {
+        ScrollView {
+            Text ("Conversation from \((interactions.first?.date ?? Date()).formatted(date: .abbreviated, time: .shortened))")
+            ForEach (interactions, id: \.id) { inter in
+                InteractionView(interaction: .constant (inter), synthesizer: $synthesizer, speaking: $speaking)
+            }
+        }
+    }
+}
+
 #if !os(watchOS) && !os(macOS)
 extension UIScrollView {
     func scrollToBottom(animated:Bool) {
@@ -121,7 +150,28 @@ extension UIScrollView {
 }
 #endif
 
+class SpeechDelegate: NSObject, AVSpeechSynthesizerDelegate {
+    @Binding var speaking: UUID?
+    
+    init (speaking: Binding<UUID?>) {
+        _speaking = speaking
+    }
+    
+    func set (speaking: Binding<UUID?>) {
+        _speaking = speaking
+    }
+    
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
+        speaking = nil
+    }
+    
+    func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didPause utterance: AVSpeechUtterance) {
+    }
+}
+
 struct ChatView: View {
+    @State var id: UUID
+    @State var starDate = Date()
     @State var chat = ChatGPT(key: openAIKey.key)
     @Binding var temperature: Float
     @ObservedObject var key = openAIKey
@@ -135,42 +185,36 @@ struct ChatView: View {
     @State var stopAutoscroll = false
     @State private var scrollViewContentOffset = CGFloat(0)
     @State var synthesizer: AVSpeechSynthesizer
-    @State var synthesizerDelegate: MyDelegate?
+    @State var synthesizerDelegate: SpeechDelegate?
     @State var playing = false
     @State var speaking: UUID? = nil
     @State var showSettings: Bool = false
+    @State var showHistory: Bool = false
     
     #if os(tvOS) || os(iOS)
     @State var sc: UIScrollView? = nil
     #endif
     
-    class MyDelegate: NSObject, AVSpeechSynthesizerDelegate {
-        @Binding var speaking: UUID?
-        
-        init (speaking: Binding<UUID?>) {
-            _speaking = speaking
-        }
-        
-        func set (speaking: Binding<UUID?>) {
-            _speaking = speaking
-        }
-        
-        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didFinish utterance: AVSpeechUtterance) {
-            speaking = nil
-        }
-        
-        func speechSynthesizer(_ synthesizer: AVSpeechSynthesizer, didPause utterance: AVSpeechUtterance) {
-        }
-    }
-    
     init (prime: Bool = false, temperature: Binding<Float>) {
         self._prime = State (initialValue: prime)
+        self._id = State (initialValue: UUID())
+        _temperature = temperature
         _synthesizer = State (initialValue: AVSpeechSynthesizer())
         _synthesizerDelegate = State (initialValue: nil)
-        _temperature = temperature
-        let d = MyDelegate (speaking: .constant(nil))
+        let d = SpeechDelegate (speaking: .constant(nil))
         _synthesizerDelegate = State (initialValue: d)
         synthesizer.delegate = synthesizerDelegate
+    }
+    
+    func saveConversation () {
+        guard let doc = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return
+        }
+        guard let result = try? JSONEncoder().encode(store.interactions) else {
+            return
+        }
+        let file = doc.appendingPathComponent("chat-\(id).json")
+        try? result.write(to: file)
     }
     
     @MainActor
@@ -182,6 +226,8 @@ struct ChatView: View {
          
         store.interactions[idx].plain += text
         appended += 1
+        
+        saveConversation()
     }
    
     func saveChat () {
@@ -367,6 +413,9 @@ struct ChatView: View {
                         Button (action: { showSettings = true }) {
                             Text ("Settings")
                         }
+                        Button (action: { showHistory = true }) {
+                            Text ("History")
+                        }
                     }, label: {
                         Label ("Settings", systemImage: "gear")
                     })
@@ -377,6 +426,9 @@ struct ChatView: View {
         #if os(iOS)
         .sheet (isPresented: $showSettings) {
             iOSGeneralSettings(settingsShown: $showSettings, temperature: $temperature, dismiss: true)
+        }
+        .sheet (isPresented: $showHistory) {
+            HistoryView ()
         }
         #endif
         .onAppear {

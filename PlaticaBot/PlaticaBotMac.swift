@@ -1,14 +1,13 @@
 //
-//  PlaticaBotApp.swift
+//  PlaticaBotMac.swift
 //  PlaticaBot
 //
-//  Created by Miguel de Icaza on 3/21/23.
+//  Created by Miguel de Icaza on 3/30/23.
 //
-
-import SwiftUI
-#if canImport(AppKit)
+#if os(macOS)
+import Foundation
 import AppKit
-#endif
+import SwiftUI
 
 #if os(macOS)
 class AppDelegate: NSObject, NSApplicationDelegate {
@@ -21,14 +20,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct PlaticaBotApp: App {
     @State var temperature: Float = 1.0
-    #if os(macOS)
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
     func quit () {
         NSApplication.shared.terminate(nil)
     }
-    #endif
     
     var body: some Scene {
         WindowGroup (id: "chat") {
@@ -40,7 +37,17 @@ struct PlaticaBotApp: App {
 
                 }
         }
-        #if os(macOS)
+        WindowGroup (id: "history"){
+            HistoryView()
+        }
+        .commands {
+            CommandGroup(before: .toolbar) {
+                Button ("History") {
+                    openWindow (id: "history")
+                }
+                .keyboardShortcut("h", modifiers: [.command])
+            }
+        }
         Settings {
             SettingsView(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
         }
@@ -65,6 +72,6 @@ struct PlaticaBotApp: App {
             }
         }
         .menuBarExtraStyle(.menu)
-        #endif
     }
 }
+#endif
