@@ -68,6 +68,7 @@ struct InteractionView: View {
                 VStack { Image (systemName: "person") }
             } text: {
                 Text (interaction.query)
+                    .textSelection(.enabled)
             }
             SingleInteractionView(color: assistantColor) {
                 VStack {
