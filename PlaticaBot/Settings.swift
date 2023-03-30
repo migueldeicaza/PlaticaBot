@@ -57,6 +57,7 @@ var openAIKey = OpenAIKey ()
 struct GeneralSettings: View {
     @Binding var settingsShown: Bool
     @Binding var temperature: Float
+    @Binding var newModel: Bool
     @State var key = getOpenAIKey()
 #if os(macOS)
     @State var showDockIcon = getShowDockIcon()
@@ -65,6 +66,10 @@ struct GeneralSettings: View {
     
     var body: some View {
         Form {
+            Picker("Model", selection: $newModel) {
+                Text("GPT-3.5-turbo").tag(false)
+                Text("GPT-4").tag(true)
+            }
             LabeledContent ("Temperature") {
                 Slider(value: $temperature, in: 0.4...1.6, step: 0.2) {
                     EmptyView()
@@ -113,10 +118,11 @@ struct GeneralSettings: View {
 struct iOSGeneralSettings: View {
     @Binding var settingsShown: Bool
     @Binding var temperature: Float
+    @Binding var newModel: Bool
     var dismiss: Bool
     var body: some View {
         NavigationView {
-            GeneralSettings(settingsShown: $settingsShown, temperature: $temperature, dismiss: dismiss)
+            GeneralSettings(settingsShown: $settingsShown, temperature: $temperature, newModel: $newModel, dismiss: dismiss)
         }
         .navigationTitle("Settings")
     }
@@ -124,11 +130,12 @@ struct iOSGeneralSettings: View {
 struct SettingsView: View {
     @Binding var settingsShown: Bool
     @Binding var temperature: Float
+    @Binding var newModel: Bool
     var dismiss: Bool
     
     var body: some View {
         TabView {
-            GeneralSettings (settingsShown: $settingsShown, temperature: $temperature, dismiss: dismiss)
+            GeneralSettings (settingsShown: $settingsShown, temperature: $temperature, newModel: $newModel, dismiss: dismiss)
                 .tabItem {
                     Label ("General", systemImage: "person")
                 }
@@ -138,6 +145,6 @@ struct SettingsView: View {
 
 struct Settings_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(settingsShown: .constant (true), temperature: .constant(1.0), dismiss: false)
+        SettingsView(settingsShown: .constant (true), temperature: .constant(1.0), newModel: .constant(false), dismiss: false)
     }
 }

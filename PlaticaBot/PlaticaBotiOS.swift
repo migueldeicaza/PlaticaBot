@@ -10,10 +10,11 @@ import SwiftUI
 @main
 struct PlaticaBotApp: App {
     @State var temperature: Float = 1.0
+    @State var newModel = false
     
     var body: some Scene {
         WindowGroup (id: "chat") {
-            ContentView(temperature: $temperature)
+            ContentView(temperature: $temperature, newModel: $newModel)
         }
     }
 }

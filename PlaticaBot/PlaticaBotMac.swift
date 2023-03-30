@@ -20,6 +20,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 @main
 struct PlaticaBotApp: App {
     @State var temperature: Float = 1.0
+    @State var newModel = false
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
@@ -29,7 +30,7 @@ struct PlaticaBotApp: App {
     
     var body: some Scene {
         WindowGroup (id: "chat") {
-            ContentView(temperature: $temperature)
+            ContentView(temperature: $temperature, newModel: $newModel)
                 .onAppear {
                     guard let window = NSApplication.shared.windows.first(where: { $0.isVisible }) else { return }
                     window.orderFront(self)
@@ -49,7 +50,7 @@ struct PlaticaBotApp: App {
             }
         }
         Settings {
-            SettingsView(settingsShown: .constant(true), temperature: $temperature, dismiss: false)
+            SettingsView(settingsShown: .constant(true), temperature: $temperature, newModel: $newModel, dismiss: false)
         }
 
         MenuBarExtra("", systemImage: "brain") {

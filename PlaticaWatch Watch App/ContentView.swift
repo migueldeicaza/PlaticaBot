@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         NavigationStack {
-            ChatView(temperature: .constant(1.0))
+            ChatView(temperature: .constant(1.0), newModel: .constant(false))
         }
     }
 }
