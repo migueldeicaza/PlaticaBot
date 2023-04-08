@@ -290,12 +290,29 @@ struct ChatView: View {
         }
     }
     
+    func acceptUserResponse () {
+#if os(tvOS) || os(iOS)
+        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+#endif
+        runQuery ()
+    }
+    
     var textFieldCore: some View {
 #if os(watchOS)
         TextField(store.interactions.count == 0 ? "Your Question" : "Follow up", text: $prompt)
 #else
-        TextField(store.interactions.count == 0 ? "Your Question" : "Follow up", text: $prompt, axis: .vertical)
-            .textFieldStyle(.roundedBorder)
+        HStack {
+            TextField(store.interactions.count == 0 ? "Your Question" : "Follow up", text: $prompt, axis: .vertical)
+                .textFieldStyle(.roundedBorder)
+            Button (action: acceptUserResponse) {
+                Image (systemName: "arrow.up.circle.fill")
+                    .foregroundColor(Color.accentColor)
+                    .font(.title2)
+            }
+            .buttonStyle(.plain)
+        }
+        .padding ([.horizontal])
+        .padding ([.top], 4)
 #endif
     }
     
@@ -310,10 +327,7 @@ struct ChatView: View {
             guard let newValueLastChar = newValue.last else { return }
             if newValueLastChar == "\n" {
                 prompt.removeLast()
-#if os(tvOS) || os(iOS)
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-#endif
-                runQuery ()
+                acceptUserResponse ()
             }
         }
     #endif
@@ -343,7 +357,10 @@ struct ChatView: View {
                             InteractionView(interaction: $inter, synthesizer: $synthesizer, speaking: $speaking)
                                 .id (inter)
                         }
-                    }.id (UUID ())
+                    }
+                    .padding ([.horizontal])
+                    .id (UUID ())
+                    
                 }
                 .scrollDismissesKeyboard(.interactively)
 #if os(iOS) || os(tvOS)
