@@ -12,7 +12,7 @@ import Introspect
 #endif
 import AVFoundation
 import AVFAudio
-
+import MarkdownUI
 /// Records what the user asked, the plain result, and the attributed version of it
 struct Interaction: Identifiable, Equatable, Hashable, Codable {
     var id = UUID()
@@ -103,10 +103,11 @@ struct InteractionView: View {
                 }
             } text: {
                 HStack (alignment: .top){
-                    Text (markdownToAttributedString(text: interaction.plain))
-#if !os(watchOS)
-                        .textSelection(.enabled)
-#endif
+                    Markdown (interaction.plain)
+//                    Text (markdownToAttributedString(text: interaction.plain))
+//#if !os(watchOS)
+//                        .textSelection(.enabled)
+//#endif
                     Spacer ()
                 }
             }

@@ -7,20 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		49068B9929E1A911007FD4EE /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 49068B9829E1A911007FD4EE /* MarkdownUI */; };
+		49068B9B29E1A921007FD4EE /* MarkdownUI in Frameworks */ = {isa = PBXBuildFile; productRef = 49068B9A29E1A921007FD4EE /* MarkdownUI */; };
 		4982B68F29CA333C008D2CCD /* PlaticaBotiOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B68E29CA333C008D2CCD /* PlaticaBotiOS.swift */; };
 		4982B69129CA333C008D2CCD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B69029CA333C008D2CCD /* ContentView.swift */; };
 		4982B69329CA333E008D2CCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4982B69229CA333E008D2CCD /* Assets.xcassets */; };
 		4982B69729CA333E008D2CCD /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4982B69629CA333E008D2CCD /* Preview Assets.xcassets */; };
 		4982B69F29CA3371008D2CCD /* Introspect in Frameworks */ = {isa = PBXBuildFile; productRef = 4982B69E29CA3371008D2CCD /* Introspect */; };
 		4982B6A429CA339A008D2CCD /* SwiftChatGPT in Frameworks */ = {isa = PBXBuildFile; productRef = 4982B6A329CA339A008D2CCD /* SwiftChatGPT */; };
-		4982B6A829CA35BA008D2CCD /* Markdownosaur in Frameworks */ = {isa = PBXBuildFile; productRef = 4982B6A729CA35BA008D2CCD /* Markdownosaur */; };
 		4982B6B029CA35EF008D2CCD /* PlaticaWatchApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6AF29CA35EF008D2CCD /* PlaticaWatchApp.swift */; };
 		4982B6B229CA35EF008D2CCD /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6B129CA35EF008D2CCD /* ContentView.swift */; };
 		4982B6B429CA35F0008D2CCD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4982B6B329CA35F0008D2CCD /* Assets.xcassets */; };
 		4982B6B729CA35F0008D2CCD /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4982B6B629CA35F0008D2CCD /* Preview Assets.xcassets */; };
 		4982B6BD29CA360A008D2CCD /* SwiftChatGPT in Frameworks */ = {isa = PBXBuildFile; productRef = 4982B6BC29CA360A008D2CCD /* SwiftChatGPT */; };
-		4982B6BF29CA360A008D2CCD /* Markdown in Frameworks */ = {isa = PBXBuildFile; productRef = 4982B6BE29CA360A008D2CCD /* Markdown */; };
-		4982B6C129CA360A008D2CCD /* Markdownosaur in Frameworks */ = {isa = PBXBuildFile; productRef = 4982B6C029CA360A008D2CCD /* Markdownosaur */; };
 		4982B6C329CA3642008D2CCD /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6C229CA3642008D2CCD /* ChatView.swift */; };
 		4982B6C429CA3642008D2CCD /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6C229CA3642008D2CCD /* ChatView.swift */; };
 		4982B6C729CA3665008D2CCD /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4982B6C529CA3665008D2CCD /* Settings.swift */; };
@@ -57,8 +56,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				49068B9929E1A911007FD4EE /* MarkdownUI in Frameworks */,
 				4982B69F29CA3371008D2CCD /* Introspect in Frameworks */,
-				4982B6A829CA35BA008D2CCD /* Markdownosaur in Frameworks */,
 				4982B6A429CA339A008D2CCD /* SwiftChatGPT in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -67,9 +66,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4982B6C129CA360A008D2CCD /* Markdownosaur in Frameworks */,
 				4982B6BD29CA360A008D2CCD /* SwiftChatGPT in Frameworks */,
-				4982B6BF29CA360A008D2CCD /* Markdown in Frameworks */,
+				49068B9B29E1A921007FD4EE /* MarkdownUI in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -166,7 +164,7 @@
 			packageProductDependencies = (
 				4982B69E29CA3371008D2CCD /* Introspect */,
 				4982B6A329CA339A008D2CCD /* SwiftChatGPT */,
-				4982B6A729CA35BA008D2CCD /* Markdownosaur */,
+				49068B9829E1A911007FD4EE /* MarkdownUI */,
 			);
 			productName = PlaticaBot;
 			productReference = 4982B68B29CA333C008D2CCD /* PlaticaBot.app */;
@@ -187,8 +185,7 @@
 			name = "PlaticaWatch Watch App";
 			packageProductDependencies = (
 				4982B6BC29CA360A008D2CCD /* SwiftChatGPT */,
-				4982B6BE29CA360A008D2CCD /* Markdown */,
-				4982B6C029CA360A008D2CCD /* Markdownosaur */,
+				49068B9A29E1A921007FD4EE /* MarkdownUI */,
 			);
 			productName = "PlaticaWatch Watch App";
 			productReference = 4982B6AD29CA35EF008D2CCD /* PlaticaWatch Watch App.app */;
@@ -224,8 +221,7 @@
 			packageReferences = (
 				4982B69D29CA3371008D2CCD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */,
 				4982B6A229CA339A008D2CCD /* XCRemoteSwiftPackageReference "SwiftChatGPT" */,
-				4982B6A529CA33DD008D2CCD /* XCRemoteSwiftPackageReference "swift-markdown" */,
-				4982B6A629CA35BA008D2CCD /* XCRemoteSwiftPackageReference "Markdownosaur" */,
+				49068B9729E1A911007FD4EE /* XCRemoteSwiftPackageReference "swift-markdown-ui" */,
 			);
 			productRefGroup = 4982B68C29CA333C008D2CCD /* Products */;
 			projectDirPath = "";
@@ -576,6 +572,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		49068B9729E1A911007FD4EE /* XCRemoteSwiftPackageReference "swift-markdown-ui" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:gonzalezreal/swift-markdown-ui.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
 		4982B69D29CA3371008D2CCD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/siteline/SwiftUI-Introspect.git";
@@ -592,25 +596,19 @@
 				kind = branch;
 			};
 		};
-		4982B6A529CA33DD008D2CCD /* XCRemoteSwiftPackageReference "swift-markdown" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/apple/swift-markdown";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.1.0;
-			};
-		};
-		4982B6A629CA35BA008D2CCD /* XCRemoteSwiftPackageReference "Markdownosaur" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/migueldeicaza/Markdownosaur";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		49068B9829E1A911007FD4EE /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 49068B9729E1A911007FD4EE /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
+		49068B9A29E1A921007FD4EE /* MarkdownUI */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 49068B9729E1A911007FD4EE /* XCRemoteSwiftPackageReference "swift-markdown-ui" */;
+			productName = MarkdownUI;
+		};
 		4982B69E29CA3371008D2CCD /* Introspect */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4982B69D29CA3371008D2CCD /* XCRemoteSwiftPackageReference "SwiftUI-Introspect" */;
@@ -621,25 +619,10 @@
 			package = 4982B6A229CA339A008D2CCD /* XCRemoteSwiftPackageReference "SwiftChatGPT" */;
 			productName = SwiftChatGPT;
 		};
-		4982B6A729CA35BA008D2CCD /* Markdownosaur */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4982B6A629CA35BA008D2CCD /* XCRemoteSwiftPackageReference "Markdownosaur" */;
-			productName = Markdownosaur;
-		};
 		4982B6BC29CA360A008D2CCD /* SwiftChatGPT */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 4982B6A229CA339A008D2CCD /* XCRemoteSwiftPackageReference "SwiftChatGPT" */;
 			productName = SwiftChatGPT;
-		};
-		4982B6BE29CA360A008D2CCD /* Markdown */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4982B6A529CA33DD008D2CCD /* XCRemoteSwiftPackageReference "swift-markdown" */;
-			productName = Markdown;
-		};
-		4982B6C029CA360A008D2CCD /* Markdownosaur */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 4982B6A629CA35BA008D2CCD /* XCRemoteSwiftPackageReference "Markdownosaur" */;
-			productName = Markdownosaur;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
