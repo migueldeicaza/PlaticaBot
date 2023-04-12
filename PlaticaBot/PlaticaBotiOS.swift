@@ -9,12 +9,12 @@ import SwiftUI
 
 @main
 struct PlaticaBotApp: App {
-    @State var temperature: Float = 1.0
-    @State var newModel = false
-    
+    @StateObject private var settings = SettingsStorage()
+
     var body: some Scene {
         WindowGroup (id: "chat") {
-            ContentView(temperature: $temperature, newModel: $newModel)
+            ContentView()
+                .environmentObject(settings)
         }
     }
 }

@@ -8,70 +8,75 @@
 import Foundation
 import SwiftUI
 
-let openAIkeytag = "OpenAI-key"
-func getOpenAIKey () -> String {
-    let key = NSUbiquitousKeyValueStore.default.string(forKey: openAIkeytag) ?? ""
-    
-    print ("Key is: \(key)")
-    return key
-}
+// MARK: -
+// MARK: Settings Storage
 
-func setOpenAIKey (_ value: String) {
-    NSUbiquitousKeyValueStore.default.set(value, forKey: openAIkeytag)
-    NSUbiquitousKeyValueStore.default.synchronize()
-}
+class SettingsStorage: ObservableObject {
+    private let keyValueStore = NSUbiquitousKeyValueStore.default
 
+    private let APIKeyKey = "OpenAI-key"
+    @Published var apiKey: String {
+        didSet {
+            keyValueStore.set(apiKey, forKey: APIKeyKey)
+            keyValueStore.synchronize()
+        }
+    }
+    static func getAPIKey() -> String {
+        return NSUbiquitousKeyValueStore.default.string(forKey: "OpenAI-key") ?? ""
+    }
+    private let temperatureKey = "Temperature-key"
+    @Published var temperature: Float {
+        didSet {
+            keyValueStore.set(temperature, forKey: temperatureKey)
+            keyValueStore.synchronize()
+        }
+    }
+    private let modelKey = "Model-key"
+    @Published var newModel: Bool {
+        didSet {
+            keyValueStore.set(newModel, forKey: modelKey)
+            keyValueStore.synchronize()
+        }
+    }
 #if os(macOS)
-let showDockIconKey = "ShowDockIcon-key"
-
-func getShowDockIcon() -> Bool {
-    if NSUbiquitousKeyValueStore.default.object(forKey: showDockIconKey) == nil {
-        return true
+    private let showDockIconKey = "ShowDockIcon-key"
+    @Published var showDockIcon: Bool {
+        didSet {
+            keyValueStore.set(showDockIcon, forKey: showDockIconKey)
+            keyValueStore.synchronize()
+        }
     }
-
-    return NSUbiquitousKeyValueStore.default.bool(forKey: showDockIconKey)
-}
-
-func setShowDockIcon(_ showDockIcon: Bool) {
-    NSUbiquitousKeyValueStore.default.set(showDockIcon, forKey: showDockIconKey)
-    NSUbiquitousKeyValueStore.default.synchronize()
-    setApplicationActivationPolicy()
-}
-
-func setApplicationActivationPolicy() {
-    if getShowDockIcon() {
-        NSApp.setActivationPolicy(.regular)
-    } else {
-        NSApp.setActivationPolicy(.accessory)
-        NSApp.activate(ignoringOtherApps: true)
-    }
-}
 #endif
+    
+    init() {
+        self.apiKey = keyValueStore.string(forKey: APIKeyKey) ?? ""
+        self.temperature = keyValueStore.object(forKey: temperatureKey) as? Float ?? 0.8
+        self.newModel = keyValueStore.bool(forKey: modelKey)
+#if os(macOS)
+        self.showDockIcon = keyValueStore.bool(forKey: showDockIconKey)
+#endif
+    }
 
-class OpenAIKey: ObservableObject {
-    @Published var key: String = getOpenAIKey()
+    static let preview = SettingsStorage()
 }
 
-var openAIKey = OpenAIKey ()
+// MARK: -
+// MARK: Settings View
 
 struct GeneralSettings: View {
+    @EnvironmentObject var settings: SettingsStorage
+    @State var apiKey: String = SettingsStorage.getAPIKey()
     @Binding var settingsShown: Bool
-    @Binding var temperature: Float
-    @Binding var newModel: Bool
-    @State var key = getOpenAIKey()
-#if os(macOS)
-    @State var showDockIcon = getShowDockIcon()
-#endif
     var dismiss: Bool
     
     var body: some View {
         Form {
-            Picker("Model", selection: $newModel) {
+            Picker("Model", selection: $settings.newModel) {
                 Text("GPT-3.5-turbo").tag(false)
                 Text("GPT-4").tag(true)
             }
             LabeledContent ("Temperature") {
-                Slider(value: $temperature, in: 0.4...1.6, step: 0.2) {
+                Slider(value: $settings.temperature, in: 0.0...1.6, step: 0.2) {
                     EmptyView()
                 } minimumValueLabel: {
                     Text("Focused").font(.footnote).fontWeight(.thin)
@@ -80,10 +85,9 @@ struct GeneralSettings: View {
                 }
             }.padding([.leading, .trailing])
             VStack (alignment: .leading) {
-                TextField ("OpenAI Key", text: $key)
+                TextField ("OpenAI Key", text: $apiKey)
                     .onSubmit {
-                        setOpenAIKey(key)
-                        openAIKey.key = key
+                        settings.apiKey = apiKey
                     }
                 Text ("Create or get an OpenAI key from the [API keys](https://platform.openai.com/account/api-keys) dashboard.")
                     .foregroundColor(.secondary)
@@ -92,20 +96,16 @@ struct GeneralSettings: View {
             .padding ()
 #if os(macOS)
             LabeledContent("Show Dock Icon") {
-                Toggle(isOn: $showDockIcon) {
+                Toggle(isOn: $settings.showDockIcon) {
                     Text(" ")
                 }
-                .onChange(of: showDockIcon, perform: { newValue in
-                    setShowDockIcon(newValue)
-                })
             }.padding([.leading, .trailing])
 #endif
             if dismiss {
                 HStack {
                     Spacer ()
                     Button ("Ok") {
-                        setOpenAIKey(key)
-                        openAIKey.key = key
+                        settings.apiKey = apiKey
                         settingsShown = false
                     }
                     Spacer ()
@@ -117,25 +117,22 @@ struct GeneralSettings: View {
 
 struct iOSGeneralSettings: View {
     @Binding var settingsShown: Bool
-    @Binding var temperature: Float
-    @Binding var newModel: Bool
     var dismiss: Bool
     var body: some View {
         NavigationView {
-            GeneralSettings(settingsShown: $settingsShown, temperature: $temperature, newModel: $newModel, dismiss: dismiss)
+            GeneralSettings(settingsShown: $settingsShown, dismiss: dismiss)
         }
         .navigationTitle("Settings")
     }
 }
+
 struct SettingsView: View {
     @Binding var settingsShown: Bool
-    @Binding var temperature: Float
-    @Binding var newModel: Bool
     var dismiss: Bool
     
     var body: some View {
         TabView {
-            GeneralSettings (settingsShown: $settingsShown, temperature: $temperature, newModel: $newModel, dismiss: dismiss)
+            GeneralSettings (settingsShown: $settingsShown, dismiss: dismiss)
                 .tabItem {
                     Label ("General", systemImage: "person")
                 }
@@ -143,8 +140,18 @@ struct SettingsView: View {
     }
 }
 
+// MARK: -
+// MARK: Preview
+
 struct Settings_Previews: PreviewProvider {
     static var previews: some View {
-        SettingsView(settingsShown: .constant (true), temperature: .constant(1.0), newModel: .constant(false), dismiss: false)
+#if os(iOS)
+        iOSGeneralSettings(settingsShown: .constant(true), dismiss: false)
+            .environmentObject(SettingsStorage.preview)
+#else
+        SettingsView(settingsShown: .constant (true), dismiss: false)
+            .environmentObject(SettingsStorage.preview)
+#endif
+        
     }
 }
