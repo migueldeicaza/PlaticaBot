@@ -301,18 +301,21 @@ struct ChatView: View {
 #if os(watchOS)
         TextField(store.interactions.count == 0 ? "Your Question" : "Follow up", text: $prompt)
 #else
-        HStack {
+        HStack (alignment: .bottom) {
             TextField(store.interactions.count == 0 ? "Your Question" : "Follow up", text: $prompt, axis: .vertical)
+#if os(iOS)
                 .textFieldStyle(.roundedBorder)
+#endif
             Button (action: acceptUserResponse) {
                 Image (systemName: "arrow.up.circle.fill")
                     .foregroundColor(Color.accentColor)
                     .font(.title2)
             }
             .buttonStyle(.plain)
+            .padding([.bottom], 2)
         }
         .padding ([.horizontal])
-        .padding ([.top], 4)
+        .padding ([.vertical], 4)
 #endif
     }
     
@@ -322,16 +325,6 @@ struct ChatView: View {
         .onSubmit {
             runQuery()
         }
-#if !os(watchOS)
-        .onChange(of: prompt) { newValue in
-            guard let newValueLastChar = newValue.last else { return }
-            if newValueLastChar == "\n" {
-                prompt.removeLast()
-                acceptUserResponse ()
-            }
-        }
-    #endif
-
     }
     
     var shareView: some View {
