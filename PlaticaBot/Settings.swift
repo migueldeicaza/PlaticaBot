@@ -21,9 +21,6 @@ class SettingsStorage: ObservableObject {
             keyValueStore.synchronize()
         }
     }
-    static func getAPIKey() -> String {
-        return NSUbiquitousKeyValueStore.default.string(forKey: "OpenAI-key") ?? ""
-    }
     private let temperatureKey = "Temperature-key"
     @Published var temperature: Float {
         didSet {
@@ -65,7 +62,7 @@ class SettingsStorage: ObservableObject {
 
 struct GeneralSettings: View {
     @EnvironmentObject var settings: SettingsStorage
-    @State var apiKey: String = SettingsStorage.getAPIKey()
+    @State var apiKey: String = ""
     @Binding var settingsShown: Bool
     var dismiss: Bool
     
@@ -86,6 +83,9 @@ struct GeneralSettings: View {
             }.padding([.leading, .trailing])
             VStack (alignment: .leading) {
                 TextField ("OpenAI Key", text: $apiKey)
+                    .onAppear {
+                        apiKey = settings.apiKey
+                    }
                     .onSubmit {
                         settings.apiKey = apiKey
                     }

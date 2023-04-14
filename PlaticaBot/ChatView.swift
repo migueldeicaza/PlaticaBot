@@ -173,7 +173,7 @@ struct ChatView: View {
     @EnvironmentObject var settings: SettingsStorage
     @State var id: UUID
     @State var starDate = Date()
-    @State var chat = ChatGPT(key: SettingsStorage.getAPIKey())
+    @State var chat = ChatGPT(key: "")
     @State var prompt: String = ""
     @State var started = Date ()
     @ObservedObject var store = InteractionStorage ()
@@ -236,7 +236,7 @@ struct ChatView: View {
         prompt = ""
         store.interactions = []
         started = Date ()
-        chat = ChatGPT(key: settings.apiKey)
+        chat = ChatGPT(key: "")
     }
     
     func getMessageSummary () -> String {
