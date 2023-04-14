@@ -50,7 +50,7 @@ class SettingsStorage: ObservableObject {
     
     init() {
         self.apiKey = keyValueStore.string(forKey: APIKeyKey) ?? ""
-        self.temperature = keyValueStore.object(forKey: temperatureKey) as? Float ?? 0.8
+        self.temperature = keyValueStore.object(forKey: temperatureKey) as? Float ?? 1.0
         self.newModel = keyValueStore.bool(forKey: modelKey)
 #if os(macOS)
         self.showDockIcon = keyValueStore.bool(forKey: showDockIconKey)
