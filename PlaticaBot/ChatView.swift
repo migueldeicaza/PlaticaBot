@@ -170,12 +170,10 @@ class SpeechDelegate: NSObject, AVSpeechSynthesizerDelegate {
 }
 
 struct ChatView: View {
+    @EnvironmentObject var settings: SettingsStorage
     @State var id: UUID
     @State var starDate = Date()
-    @State var chat = ChatGPT(key: openAIKey.key)
-    @Binding var temperature: Float
-    @ObservedObject var key = openAIKey
-    @Binding var newModel: Bool
+    @State var chat = ChatGPT(key: "")
     @State var prompt: String = ""
     @State var started = Date ()
     @ObservedObject var store = InteractionStorage ()
@@ -196,14 +194,12 @@ struct ChatView: View {
     #endif
     
     
-    init (prime: Bool = false, temperature: Binding<Float>, newModel: Binding<Bool>) {
+    init (prime: Bool = false) {
         self._prime = State (initialValue: prime)
         self._id = State (initialValue: UUID())
-        _temperature = temperature
         _synthesizer = State (initialValue: AVSpeechSynthesizer())
         _synthesizerDelegate = State (initialValue: nil)
         let d = SpeechDelegate (speaking: .constant(nil))
-        _newModel = newModel
         _synthesizerDelegate = State (initialValue: d)
         synthesizer.delegate = synthesizerDelegate
     }
@@ -240,7 +236,7 @@ struct ChatView: View {
         prompt = ""
         store.interactions = []
         started = Date ()
-        chat = ChatGPT(key: key.key)
+        chat = ChatGPT(key: "")
     }
     
     func getMessageSummary () -> String {
@@ -267,9 +263,9 @@ struct ChatView: View {
         prompt = ""
         appended += 1
         Task {
-            chat.model = newModel ? "gpt-4-0314" : "gpt-3.5-turbo"
-            chat.key = openAIKey.key
-            switch await chat.streamChatText(copy, temperature: temperature) {
+            chat.model = settings.newModel ? "gpt-4-0314" : "gpt-3.5-turbo"
+            chat.key = settings.apiKey
+            switch await chat.streamChatText(copy, temperature: settings.temperature) {
             case .failure(let error):
                 appendAnswer("Communication Error:\n\(error.description)")
                 return
@@ -419,8 +415,8 @@ struct ChatView: View {
                 ControlGroup {
                     shareView
                     Menu (content: {
-                        Button (action: { newModel.toggle() }) {
-                            Text ("Toggle Engine - " + (newModel ? "GPT4" : "GPT3"))
+                        Button (action: { settings.newModel.toggle() }) {
+                            Text ("Toggle Engine - " + (settings.newModel ? "GPT4" : "GPT3"))
                         }
                         Button (action: { showSettings = true }) {
                             Text ("Settings")
@@ -437,7 +433,7 @@ struct ChatView: View {
         }
         #if os(iOS)
         .sheet (isPresented: $showSettings) {
-            iOSGeneralSettings(settingsShown: $showSettings, temperature: $temperature, newModel: $newModel, dismiss: true)
+            iOSGeneralSettings(settingsShown: $showSettings, dismiss: true)
         }
         .sheet (isPresented: $showHistory) {
             HistoryView ()
@@ -455,6 +451,7 @@ struct ChatView: View {
 
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
-        ChatView(prime: true, temperature: .constant(1.0), newModel: .constant(false))
+        ChatView(prime: true)
+            .environmentObject(SettingsStorage.preview)
     }
 }

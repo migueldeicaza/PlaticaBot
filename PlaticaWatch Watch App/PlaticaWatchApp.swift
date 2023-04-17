@@ -9,12 +9,12 @@ import SwiftUI
 
 @main
 struct PlaticaWatch_Watch_AppApp: App {
+    @StateObject private var settings = SettingsStorage()
+
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear {
-                    let key = getOpenAIKey()
-                }
+                .environmentObject(settings)
         }
     }
 }

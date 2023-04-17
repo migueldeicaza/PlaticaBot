@@ -14,13 +14,21 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         setApplicationActivationPolicy()
     }
+    
+    func setApplicationActivationPolicy(_ shouldShowDockIcon: Bool = true) {
+        if shouldShowDockIcon {
+            NSApp.setActivationPolicy(.regular)
+        } else {
+            NSApp.setActivationPolicy(.accessory)
+            NSApp.activate(ignoringOtherApps: true)
+        }
+    }
 }
 #endif
 
 @main
 struct PlaticaBotApp: App {
-    @State var temperature: Float = 1.0
-    @State var newModel = false
+    @StateObject private var settings = SettingsStorage()
     @Environment(\.openWindow) private var openWindow
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
 
@@ -30,13 +38,13 @@ struct PlaticaBotApp: App {
     
     var body: some Scene {
         WindowGroup (id: "chat") {
-            ContentView(temperature: $temperature, newModel: $newModel)
+            ContentView()
                 .onAppear {
                     guard let window = NSApplication.shared.windows.first(where: { $0.isVisible }) else { return }
                     window.orderFront(self)
                     NSApplication.shared.activate(ignoringOtherApps: true)
-
                 }
+                .environmentObject(settings)
         }
         WindowGroup (id: "history"){
             HistoryView()
@@ -50,7 +58,11 @@ struct PlaticaBotApp: App {
             }
         }
         Settings {
-            SettingsView(settingsShown: .constant(true), temperature: $temperature, newModel: $newModel, dismiss: false)
+            SettingsView(settingsShown: .constant(true), dismiss: false)
+                .onChange(of: settings.showDockIcon) { newValue in
+                    appDelegate.setApplicationActivationPolicy(newValue)
+                }
+                .environmentObject(settings)
         }
 
         MenuBarExtra("", systemImage: "brain") {
