@@ -25,7 +25,9 @@ class InteractionStorage: ObservableObject {
     @Published var interactions: [Interaction] = []
     //Interaction (query: "Where is France", plain: "France is a country located in Western Europe. It shares borders with Belgium, Luxembourg, Germany, Switzerland, Italy, Spain, and Andorra. The country is also bordered by the English Channel to the north and the Atlantic Ocean to the west.")]
     
-    init () { }
+    init () {
+        print ("Created")
+    }
 }
 
 struct SingleInteractionView<Content:View, Content2:View>: View {
@@ -54,8 +56,18 @@ let userColor = Color ("UserColor")
 let assistantColor = Color ("BotColor")
 #endif
 
+extension ShapeStyle where Self == Color {
+    static var random: Color {
+        Color(
+            red: .random(in: 0...1),
+            green: .random(in: 0...1),
+            blue: .random(in: 0...1)
+        )
+    }
+}
+
 struct InteractionView: View {
-    @Binding var interaction: Interaction
+    var interaction: Interaction
     @Binding var synthesizer: AVSpeechSynthesizer
     @Binding var speaking: UUID?
     
@@ -69,9 +81,9 @@ struct InteractionView: View {
                 VStack { Image (systemName: "person") }
             } text: {
                 Text (interaction.query)
-                #if !os(watchOS)
+#if !os(watchOS)
                     .textSelection(.enabled)
-                #endif
+#endif
             }
             SingleInteractionView(color: assistantColor) {
                 VStack {
@@ -94,9 +106,9 @@ struct InteractionView: View {
                             utterance.voice = AVSpeechSynthesisVoice(language: "en-GB")
                             // Alternative:
                             //                             utterance.voice = AVSpeechSynthesisVoice(identifier: "com.apple.eloquence.en-US.Rocko")
-
+                            
                             //utterance.rate = 0.5
-
+                            
                             synthesizer.speak(utterance)
                             speaking = interaction.id
                         }
@@ -111,6 +123,8 @@ struct InteractionView: View {
                 }
             }
         }
+        //.background(.random)
+        
     }
 }
 
@@ -133,7 +147,7 @@ struct StaticChatView: View {
         ScrollView {
             Text ("Conversation from \((interactions.first?.date ?? Date()).formatted(date: .abbreviated, time: .shortened))")
             ForEach (interactions, id: \.id) { inter in
-                InteractionView(interaction: .constant (inter), synthesizer: $synthesizer, speaking: $speaking)
+                InteractionView(interaction: inter, synthesizer: $synthesizer, speaking: $speaking)
             }
         }
     }
@@ -176,7 +190,7 @@ struct ChatView: View {
     @State var chat = ChatGPT(key: "")
     @State var prompt: String = ""
     @State var started = Date ()
-    @ObservedObject var store = InteractionStorage ()
+    @StateObject var store = InteractionStorage ()
     @FocusState private var isPromptFocused: Bool
     @State var prime = false
     @State var appended = 0
@@ -188,6 +202,7 @@ struct ChatView: View {
     @State var speaking: UUID? = nil
     @State var showSettings: Bool = false
     @State var showHistory: Bool = false
+    @State var chatInteraction: Interaction? = nil
     
     #if os(tvOS) || os(iOS)
     @State var sc: UIScrollView? = nil
@@ -217,12 +232,7 @@ struct ChatView: View {
     
     @MainActor
     func appendAnswer (_ text: String) {
-        let idx = store.interactions.count-1
-        if idx < 0 {
-            return
-        }
-         
-        store.interactions[idx].plain += text
+        chatInteraction?.plain += text
         appended += 1
         
         saveConversation()
@@ -257,11 +267,12 @@ struct ChatView: View {
     }
     
     func runQuery () {
-        store.interactions.append(Interaction(query: prompt, plain: ""))
         stopAutoscroll = false
+        chatInteraction = Interaction(query: prompt, plain: "")
         let copy = prompt
         prompt = ""
         appended += 1
+
         Task {
             chat.model = settings.newModel ? "gpt-4-0314" : "gpt-3.5-turbo"
             chat.key = settings.apiKey
@@ -279,6 +290,10 @@ struct ChatView: View {
                     }
                 }
                 DispatchQueue.main.async {
+                    if let chatInteraction {
+                        store.interactions.append(chatInteraction)
+                    }
+                    chatInteraction = nil
                     appended += 1
                 }
                 saveChat ()
@@ -320,6 +335,7 @@ struct ChatView: View {
         .focused ($isPromptFocused)
         .onSubmit {
             runQuery()
+            isPromptFocused =  true
         }
     }
     
@@ -342,14 +358,15 @@ struct ChatView: View {
                                 Text ("Welcome to PlaticaBot, ask your questions below")
                             }
                         }
-                        ForEach ($store.interactions, id: \.id) { $inter in
-                            InteractionView(interaction: $inter, synthesizer: $synthesizer, speaking: $speaking)
-                                .id (inter)
+                        ForEach (store.interactions) { inter in
+                            InteractionView(interaction: inter, synthesizer: $synthesizer, speaking: $speaking)
+                        }
+                        if let chatInteraction {
+                            InteractionView(interaction: chatInteraction, synthesizer: $synthesizer, speaking: $speaking)
+                                .id (10)
                         }
                     }
                     .padding ([.horizontal])
-                    .id (UUID ())
-                    
                 }
                 .scrollDismissesKeyboard(.interactively)
 #if os(iOS) || os(tvOS)
@@ -365,7 +382,7 @@ struct ChatView: View {
 #elseif os(macOS) || os(watchOS)
                 .onChange(of: appended, perform: { value in
                     if let last = store.interactions.last {
-                        proxy.scrollTo(last.id, anchor: .bottom)
+                        proxy.scrollTo(10, anchor: .bottom)
                     }
                 })
 #endif
