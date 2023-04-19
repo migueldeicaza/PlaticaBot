@@ -26,7 +26,6 @@ class InteractionStorage: ObservableObject {
     //Interaction (query: "Where is France", plain: "France is a country located in Western Europe. It shares borders with Belgium, Luxembourg, Germany, Switzerland, Italy, Spain, and Andorra. The country is also bordered by the English Channel to the north and the Atlantic Ocean to the west.")]
     
     init () {
-        print ("Created")
     }
 }
 
@@ -262,7 +261,6 @@ struct ChatView: View {
             result += "User: \(item.query)\n\nPlaticaBot: \(item.plain)\n\n"
         }
         
-        print ( "AttributedString: \(result)")
         return markdownToAttributedString(text: result)
     }
     
