@@ -148,6 +148,21 @@ extension UIScrollView {
         }
     }
 }
+class ScrollViewDelegate: NSObject, UIScrollViewDelegate {
+    var onDrag: (()->Void)? = nil
+    var onBounce: (()->Void)? = nil
+
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        onDrag?()
+    }
+    
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let bottomEdge = scrollView.contentOffset.y + scrollView.frame.size.height
+        if bottomEdge >= scrollView.contentSize.height {
+            onBounce?()
+        }
+    }
+}
 #endif
 
 class SpeechDelegate: NSObject, AVSpeechSynthesizerDelegate {
@@ -188,6 +203,7 @@ struct ChatView: View {
     @State var speaking: UUID? = nil
     @State var showSettings: Bool = false
     @State var showHistory: Bool = false
+    private var scrollViewDelegate = ScrollViewDelegate()
     
     #if os(tvOS) || os(iOS)
     @State var sc: UIScrollView? = nil
@@ -355,6 +371,9 @@ struct ChatView: View {
 #if os(iOS) || os(tvOS)
                 .introspectScrollView { sc in
                     self.sc = sc
+                    self.scrollViewDelegate.onDrag = { self.stopAutoscroll = true }
+                    self.scrollViewDelegate.onBounce = { self.stopAutoscroll = false }
+                    self.sc?.delegate = scrollViewDelegate
                 }
                 .onChange(of: appended, perform: { value in
                     //proxy.scrollTo(1, anchor: .bottom)
