@@ -162,19 +162,33 @@ extension UIScrollView {
     }
 }
 class ScrollViewDelegate: NSObject, UIScrollViewDelegate {
-    var onDrag: (()->Void)? = nil
-    var onBounce: (()->Void)? = nil
+    private var contentHeightWhenDragEnded: CGFloat?
 
+    var onDrag: (()->Void)? = nil
+    var onBottomReached: (()->Void)? = nil
+
+    /// disable autoscroll when user starts manually scrolling
     func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         onDrag?()
     }
-    
+
+    /// resume autoscroll when user scrolls back down to bottom
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
         let bottomEdge = scrollView.contentOffset.y + scrollView.frame.size.height
         if bottomEdge >= scrollView.contentSize.height {
-            onBounce?()
+            onBottomReached?()
         }
+        contentHeightWhenDragEnded = scrollView.contentSize.height
     }
+    func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        let bottomEdge = scrollView.contentOffset.y + scrollView.frame.size.height
+        if let contentHeightWhenDragEnded = self.contentHeightWhenDragEnded,
+           bottomEdge >= contentHeightWhenDragEnded {
+            onBottomReached?()
+        }
+        contentHeightWhenDragEnded = nil
+    }
+    
 }
 #endif
 
@@ -387,7 +401,7 @@ struct ChatView: View {
                 .introspectScrollView { sc in
                     self.sc = sc
                     self.scrollViewDelegate.onDrag = { self.stopAutoscroll = true }
-                    self.scrollViewDelegate.onBounce = { self.stopAutoscroll = false }
+                    self.scrollViewDelegate.onBottomReached = { self.stopAutoscroll = false }
                     self.sc?.delegate = scrollViewDelegate
                 }
                 .onChange(of: appended, perform: { value in
