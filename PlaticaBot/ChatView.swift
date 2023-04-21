@@ -231,7 +231,9 @@ struct ChatView: View {
     @State var showSettings: Bool = false
     @State var showHistory: Bool = false
     @State var chatInteraction: Interaction? = nil
+    #if os(iOS)
     private var scrollViewDelegate = ScrollViewDelegate()
+    #endif
     
     #if os(tvOS) || os(iOS)
     @State var sc: UIScrollView? = nil
