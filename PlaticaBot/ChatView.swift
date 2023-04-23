@@ -323,11 +323,11 @@ struct ChatView: View {
                     if let chatInteraction {
                         store.interactions.append(chatInteraction)
                     }
-                    
+                    saveChat ()
+
                     chatInteraction = nil
                     appended += 1
                 }
-                saveChat ()
             }
         }
     }

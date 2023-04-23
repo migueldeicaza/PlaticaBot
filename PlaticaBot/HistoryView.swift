@@ -25,7 +25,7 @@ struct ChatPreview: View {
 struct HistoryView: View {
     @State var chats: [[Interaction]] = []
     
-    init () {
+    func loadChats () {
         guard let doc = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first else {
             return
         }
@@ -44,7 +44,7 @@ struct HistoryView: View {
             }
             result.append (interaction)
         }
-        _chats = State (initialValue: result)
+        chats = result
     }
     
     var body: some View {
@@ -64,6 +64,8 @@ struct HistoryView: View {
             #if os(macOS)
             .formStyle(.grouped)
             #endif
+        }.onAppear {
+            loadChats()
         }
     }
 }
