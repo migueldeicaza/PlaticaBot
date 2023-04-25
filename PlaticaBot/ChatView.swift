@@ -304,7 +304,7 @@ struct ChatView: View {
         appended += 1
 
         Task {
-            chat.model = settings.newModel ? "gpt-4-0314" : "gpt-3.5-turbo"
+            chat.model = settings.newModel ? "gpt-4" : "gpt-3.5-turbo"
             chat.key = settings.apiKey
             switch await chat.streamChatText(copy, temperature: settings.temperature) {
             case .failure(let error):
