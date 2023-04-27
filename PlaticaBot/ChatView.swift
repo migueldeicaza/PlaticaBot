@@ -394,11 +394,14 @@ struct ChatView: View {
                         }
                         if let chatInteraction {
                             InteractionView(interaction: chatInteraction, synthesizer: $synthesizer, speaking: $speaking)
-                                .id (10)
+                                .id(chatInteraction.id)
                         }
                     }
+                    .id(UUID())
                     .padding ([.horizontal])
                 }
+                .id(UUID())
+
                 .scrollDismissesKeyboard(.interactively)
 #if os(iOS) || os(tvOS)
                 .introspectScrollView { sc in
@@ -415,8 +418,8 @@ struct ChatView: View {
                 })
 #elseif os(macOS) || os(watchOS)
                 .onChange(of: appended, perform: { value in
-                    if let last = store.interactions.last {
-                        proxy.scrollTo(10, anchor: .bottom)
+                    if let chatInteraction {
+                        proxy.scrollTo(chatInteraction.id, anchor: .bottom)
                     }
                 })
 #endif
