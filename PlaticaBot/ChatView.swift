@@ -232,13 +232,11 @@ struct ChatView: View {
     @State var showHistory: Bool = false
     @State var chatInteraction: Interaction? = nil
     @State var serial = 1
-    #if os(iOS)
-    private var scrollViewDelegate = ScrollViewDelegate()
-    #endif
-    
     #if os(tvOS) || os(iOS)
     @State var sc: UIScrollView? = nil
+    private var scrollViewDelegate = ScrollViewDelegate()
     #endif
+    private let ScrollViewID = UUID()
     
     
     init (prime: Bool = false) {
@@ -377,10 +375,40 @@ struct ChatView: View {
                   preview: SharePreview("PlaticaBot", icon: Image (systemName: "tortoise.fill")))
     }
     
+    private struct OffsetReaderView: View {
+        @State var onScrollUp: ()->Void
+        @State private var prevOffset:CGFloat = .zero
+
+        private struct OffsetPreferenceKey: PreferenceKey {
+            static var defaultValue: CGFloat = .zero
+            static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {}
+        }
+        
+        var body: some View {
+            GeometryReader { proxy in
+                Color.clear
+                    .preference(
+                        key: OffsetPreferenceKey.self,
+                        value: proxy.frame(in: .named("frameLayer")).minY
+                    )
+            }
+            .frame(height:0)
+            .onPreferenceChange(OffsetPreferenceKey.self, perform: { offset in
+                if prevOffset < offset {
+                    onScrollUp()
+                }
+                prevOffset = offset
+            })
+        }
+    }
+
     var body: some View {
         VStack (alignment: .leading) {
             ScrollViewReader { proxy in
                 ScrollView  {
+                    #if os(macOS)
+                    OffsetReaderView(onScrollUp: { stopAutoscroll = true })
+                    #endif
                     VStack {
                         SingleInteractionView (color: assistantColor) {
                             Image (systemName: "brain")
@@ -400,7 +428,8 @@ struct ChatView: View {
                     .id(UUID())
                     .padding ([.horizontal])
                 }
-                .id(UUID())
+                .id(ScrollViewID)
+                .coordinateSpace(name: "frameLayer")
 
                 .scrollDismissesKeyboard(.interactively)
 #if os(iOS) || os(tvOS)
@@ -418,7 +447,7 @@ struct ChatView: View {
                 })
 #elseif os(macOS) || os(watchOS)
                 .onChange(of: appended, perform: { value in
-                    if let chatInteraction {
+                    if !stopAutoscroll, let chatInteraction {
                         proxy.scrollTo(chatInteraction.id, anchor: .bottom)
                     }
                 })
