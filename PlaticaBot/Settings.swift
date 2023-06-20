@@ -70,6 +70,7 @@ struct GeneralSettings: View {
         Form {
             Picker("Model", selection: $settings.newModel) {
                 Text("GPT-3.5-turbo").tag(false)
+                Text("GPT-3.5-turbo-16k").tag(false)
                 Text("GPT-4").tag(true)
             }
             LabeledContent ("Temperature") {
